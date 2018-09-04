@@ -19,7 +19,8 @@ class Save extends \Acommerce\Address\Controller\Adminhtml\Address
         if ($postdata = $this->getRequest()->getPostValue()){
             try {
                 $connection = $this->resource->getConnection();
-                $select = $connection->select()->from(['dcr' => 'directory_country_region'], ['region_id','code'])->where('country_id = ?', $postdata['country_id']);
+                $regionTable = $this->resource->getTableName('directory_country_region');
+                $select = $connection->select()->from(['dcr' => $regionTable], ['region_id','code'])->where('country_id = ?', $postdata['country_id']);
                 $country_region = $connection->fetchAll($select);
                 $regions = [];
                 foreach ($country_region as $reg) {
