@@ -4,8 +4,14 @@ namespace Acommerce\Address\Plugin\Magento\Checkout\Block\Checkout;
 
 class LayoutProcessor
 {
+    /**
+     * @var \Acommerce\Address\Helper\Data
+     */
     protected $helper;
 
+    /**
+     * @param \Acommerce\Address\Helper\Data $helper
+     */
     public function __construct(
         \Acommerce\Address\Helper\Data $helper
     ) {
@@ -52,11 +58,17 @@ class LayoutProcessor
         ['children']['shippingAddress']['children']['shipping-address-fieldset']
         ['children']['city']['sortOrder'] = 108;
 
+        if ($this->helper->getStoreConfigValue('checkout/checkout_address/disable_country', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) {
+            $result['components']['checkout']['children']['steps']['children']['shipping-step']
+            ['children']['shippingAddress']['children']['shipping-address-fieldset']
+            ['children']['country_id']['visible'] = false;
+        }
+
         return $result;
     }
 
-    protected function getBillingFormFields($result){
-        if(isset($result['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list'])) {
+    protected function getBillingFormFields($result) {
+        if (isset($result['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list'])) {
             $paymentForms = $result['components']['checkout']['children']['steps']['children']
             ['billing-step']['children']['payment']['children']
             ['payments-list']['children'];
@@ -80,28 +92,35 @@ class LayoutProcessor
                 $result['components']['checkout']['children']['steps']['children']
                 ['billing-step']['children']['payment']['children']
                 ['payments-list']['children'][$paymentMethodCode . '-form']['children']['form-fields']['children'] = $billingFields;
+
+                if ($this->helper->getStoreConfigValue('checkout/checkout_address/disable_country', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) {
+                    $result['components']['checkout']['children']['steps']['children']
+                    ['billing-step']['children']['payment']['children']['payments-list']['children']
+                    [$paymentMethodCode . '-form']['children']['form-fields']['children']['country_id']['visible'] = false;
+                }
             }
         }
 
         return $result;
     }
 
-    protected function getFields($scope,$addressType){
+    protected function getFields($scope, $addressType) {
         $fields = [];
-        foreach($this->getAdditionalFields($addressType) as $field){
-            $fields[$field] = $this->getField($field,$scope);
+        foreach ($this->getAdditionalFields($addressType) as $field) {
+            $fields[$field] = $this->getField($field, $scope);
         }
         return $fields;
     }
 
     protected function getAdditionalFields($addressType='shipping'){
-        if($addressType=='shipping') {
+        if ($addressType == 'shipping') {
             return $this->helper->getExtraCheckoutAddressFields('extra_checkout_shipping_address_fields');
         }
         return  $this->helper->getExtraCheckoutAddressFields('extra_checkout_billing_address_fields');
     }
 
-    protected function getField($attributeCode,$scope) {
+    protected function getField($attributeCode, $scope) {
+        $disableTownship = (bool) $this->helper->getStoreConfigValue('checkout/checkout_address/disable_township', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
         $field = [];
         if ($attributeCode == 'city_id') {
             $field = [
@@ -123,7 +142,7 @@ class LayoutProcessor
                     'setOptions' => 'index = checkoutProvider:dictionaries.city_id',
                 ],
                 'deps' => 'checkoutProvider',
-                'dataScope' => $scope . '.' . $attributeCode,
+                'dataScope' => $scope . '.' . $attributeCode
             ];
         } elseif ($attributeCode == 'township_id') {
             $field = [
@@ -146,6 +165,7 @@ class LayoutProcessor
                 ],
                 'deps' => 'checkoutProvider',
                 'dataScope' => $scope . '.' . $attributeCode,
+                'hidden' => $disableTownship
             ];
         } elseif ($attributeCode == 'township') {
             $field = [
@@ -156,6 +176,7 @@ class LayoutProcessor
                     'required-entry' => true,
                 ],
                 'dataScope' => $scope . '.' . $attributeCode,
+                'hidden' => $disableTownship
             ];
         }
         return $field;

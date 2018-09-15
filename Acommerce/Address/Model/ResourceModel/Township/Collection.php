@@ -53,7 +53,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         if (count($options) > 0) {
             array_unshift(
                 $options,
-                ['title' => null, 'value' => null, 'label' => __('Please select a township.')]
+                ['title' => '', 'value' => '', 'label' => __('Please select a township.')]
             );
         }
         return $options;
@@ -67,7 +67,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 continue;
             }
             $townships[$township->getCityId()][$township->getTownshipId()] = [
-                'code' => $township->getCode(),
+                'code' => ($township->getCode() != null) ? $township->getCode() : '',
                 'name' => ($township->getName() != '') ? $township->getName() : $township->getDefaultName()
             ];
         }

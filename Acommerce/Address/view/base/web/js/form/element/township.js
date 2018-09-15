@@ -22,6 +22,16 @@ define([
         },
 
         /**
+         * Extends instance with defaults, extends config with formatted values
+         *     and options, and invokes initialize method of AbstractElement class.
+         *     If instance's 'customEntry' property is set to true, calls 'initInput'
+         */
+        initialize: function () {
+            this._super();
+            this.initialOptions = JSON.parse(localStorage.getItem("townshipData"));
+        },
+
+        /**
          * @param {String} value
          */
         update: function (value) {
@@ -33,14 +43,20 @@ define([
                 return item[field] === value || item.value === '';
             });
 
-            if (result.length > 0 && value != undefined && value != '') {
-                this.filter(value, field);
-                this.setVisible(true);
-                this.toggleInput(false);
-            } else {
+            if (this.hidden == true) {
                 this.setVisible(false);
+                this.toggleInput(false);
                 this.toggleValue();
-                this.toggleInput(true);
+            } else {
+                if (result.length > 0 && value != undefined && value != '') {
+                    this.filter(value, field);
+                    this.setVisible(true);
+                    this.toggleInput(false);
+                } else {
+                    this.setVisible(false);
+                    this.toggleValue();
+                    this.toggleInput(true);
+                }
             }
         },
 
@@ -52,13 +68,19 @@ define([
          * @param {String} field
          */
         filter: function (value, field) {
-            var cities = registry.get(this.parentName + '.' + 'city_id');
-            if (cities && value != undefined && value != ''){
-                this._super(value, field);
-            } else {
+            if (this.hidden == true) {
                 this.setVisible(false);
+                this.toggleInput(false);
                 this.toggleValue();
-                this.toggleInput(true);
+            } else {
+                var cities = registry.get(this.parentName + '.' + 'city_id');
+                if (cities && value != undefined && value != ''){
+                    this._super(value, field);
+                } else {
+                    this.setVisible(false);
+                    this.toggleValue();
+                    this.toggleInput(true);
+                }
             }
         },
 

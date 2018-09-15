@@ -6,4 +6,7 @@
     <type name="Magento\Checkout\Model\DefaultConfigProvider">
         <plugin disabled="false" name="Acommerce_Address_Plugin_Magento_Checkout_Model_DefaultConfigProvider" sortOrder="10" type="Acommerce\Address\Plugin\Magento\Checkout\Model\AddressProvider"/>
     </type>
+    <type name="Magento\Ui\Component\Form\AttributeMapper">
+        <plugin disabled="false" name="Acommerce_Address_Plugin_Magento_Ui_Component_Form_AttributeMapper" sortOrder="10" type="Acommerce\Address\Plugin\Magento\Ui\Component\Form\AttributeMapper"/>
+    </type>
 </config>

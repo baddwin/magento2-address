@@ -53,7 +53,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         if (count($options) > 0) {
             array_unshift(
                 $options,
-                ['title' => null, 'value' => null, 'label' => __('Please select a city.')]
+                ['title' => '', 'value' => '', 'label' => __('Please select a city.')]
             );
         }
         return $options;
@@ -67,7 +67,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 continue;
             }
             $cities[$city->getRegionId()][$city->getCityId()] = [
-                'code' => $city->getCode(),
+                'code' => ($city->getCode() != null) ? $city->getCode() : '',
                 'name' => ($city->getName() != '') ? $city->getName() : $city->getDefaultName()
             ];
         }

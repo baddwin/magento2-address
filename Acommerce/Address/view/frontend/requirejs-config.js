@@ -10,10 +10,10 @@ var config = {
             'Magento_Checkout/js/action/create-shipping-address': {
                 'Acommerce_Address/js/action/create-shipping-address-mixin': true
             },
-            'Magento_Checkout/js/action/place-order': {
+            'Magento_Checkout/js/action/create-billing-address': {
                 'Acommerce_Address/js/action/set-billing-address-mixin': true
             },
-            'Magento_Checkout/js/action/create-billing-address': {
+            'Magento_Checkout/js/action/place-order': {
                 'Acommerce_Address/js/action/set-billing-address-mixin': true
             },
             'Magento_Customer/js/model/customer/address': {

@@ -4,8 +4,14 @@ namespace Acommerce\Address\Plugin\Magento\Checkout\Block\Checkout;
 
 class DirectoryDataProcessor
 {
+    /**
+     * @var \Acommerce\Address\Helper\Data
+     */
     protected $helper;
 
+    /**
+     * @param \Acommerce\Address\Helper\Data $helper
+     */
     public function __construct(
         \Acommerce\Address\Helper\Data $helper
     ) {
@@ -17,7 +23,7 @@ class DirectoryDataProcessor
         $result
     ) {
         $result['components']['checkoutProvider']['dictionaries']['city_id'] = $this->helper->getCityDataProvider();
-        $result['components']['checkoutProvider']['dictionaries']['township_id'] = $this->helper->getTownshipDataProvider();
+        // $result['components']['checkoutProvider']['dictionaries']['township_id'] = $this->helper->getTownshipDataProvider();
         return $result;
     }
 }

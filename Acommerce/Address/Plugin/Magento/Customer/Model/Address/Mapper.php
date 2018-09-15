@@ -4,9 +4,20 @@ namespace Acommerce\Address\Plugin\Magento\Customer\Model\Address;
 
 class Mapper
 {
+    /**
+     * @var \Magento\Customer\Model\Address
+     */
     protected $addressFactory;
+
+    /**
+     * @var \Acommerce\Address\Helper\Data
+     */
     protected $helperData;
 
+    /**
+     * @param \Magento\Customer\Model\AddressFactory $addressFactory
+     * @param \Acommerce\Address\Helper\Data $helperData
+     */
     public function __construct(
         \Magento\Customer\Model\AddressFactory $addressFactory,
         \Acommerce\Address\Helper\Data $helperData

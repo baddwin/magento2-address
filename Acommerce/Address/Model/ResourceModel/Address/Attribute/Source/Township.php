@@ -5,9 +5,19 @@ namespace Acommerce\Address\Model\ResourceModel\Address\Attribute\Source;
 class Township extends \Magento\Eav\Model\Entity\Attribute\Source\Table
 {
     /**
+     * @var \Magento\Framework\Locale\ResolverInterface
+     */
+    protected $locale;
+
+    /**
      * @var \Acommerce\Address\Model\ResourceModel\Township\CollectionFactory
      */
     protected $townshipFactory;
+
+    /**
+     * @var array
+     */
+    protected $_options;
 
     /**
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory $attrOptionCollectionFactory
@@ -44,6 +54,6 @@ class Township extends \Magento\Eav\Model\Entity\Attribute\Source\Table
      */
     protected function _createCollection()
     {
-        return $this->townshipFactory->create()->load()->initLocale($this->locale);
+        return $this->townshipFactory->create()->initLocale($this->locale->getLocale());
     }
 }

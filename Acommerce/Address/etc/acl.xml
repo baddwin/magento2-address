@@ -4,7 +4,7 @@
         <resources>
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Customer::customer">
-                    <resource id="Acommerce_Address::address">
+                    <resource id="Acommerce_Address::address" title="Address">
                         <resource id="Acommerce_Address::region" title="Regions Manager">
                             <resource id="Acommerce_Address::region_create" title="Create"/>
                             <resource id="Acommerce_Address::region_edit" title="Edit" />

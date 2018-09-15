@@ -15,6 +15,11 @@ class City extends \Magento\Eav\Model\Entity\Attribute\Source\Table
     protected $cityFactory;
 
     /**
+     * @var array
+     */
+    protected $_options;
+
+    /**
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory $attrOptionCollectionFactory
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\OptionFactory $attrOptionFactory
      * @param \Magento\Framework\Locale\ResolverInterface $locale
@@ -49,6 +54,6 @@ class City extends \Magento\Eav\Model\Entity\Attribute\Source\Table
      */
     protected function _createCollection()
     {
-        return $this->cityFactory->create()->load()->initLocale($this->locale);
+        return $this->cityFactory->create()->initLocale($this->locale->getLocale());
     }
 }

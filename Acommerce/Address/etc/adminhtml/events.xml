@@ -3,4 +3,7 @@
     <event name="adminhtml_customer_save_after">
         <observer name="prepare_customer_address_township_data" instance="Acommerce\Address\Observer\Customer\SaveExtraAddressField" />
     </event>
+    <event name="admin_system_config_changed_section_checkout">
+        <observer name="update_default_country" instance="Acommerce\Address\Observer\Config\UpdateDefaultCountry" />
+    </event>
 </config>

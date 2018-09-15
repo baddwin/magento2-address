@@ -4,15 +4,17 @@ namespace Acommerce\Address\Plugin\Magento\Quote\Model;
 
 class BillingAddressManagement
 {
+    /**
+     * @var \Acommerce\Address\Helper\Data
+     */
     protected $helper;
 
-    protected $logger;
-
+    /**
+     * @param \Acommerce\Address\Helper\Data $helper
+     */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
         \Acommerce\Address\Helper\Data $helper
     ) {
-        $this->logger = $logger;
         $this->helper = $helper;
     }
 

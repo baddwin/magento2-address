@@ -7,30 +7,78 @@ use Magento\Framework\App\Helper\AbstractHelper;
 
 class Data extends AbstractHelper
 {
-    protected $logger;
+    /**
+     * @var \Magento\Framework\DataObject\Copy\Config
+     */
     protected $fieldsetConfig;
-    protected $storeManager;
-    protected $configCacheType;
-    protected $jsonHelper;
-    protected $addressFactory;
-    protected $locale;
-    protected $cityCollection;
-    protected $cityJson;
-    protected $townshipCollection;
-    protected $townshipJson;
 
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Framework\App\Cache\Type\Config
+     */
+    protected $configCacheType;
+
+    /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $jsonHelper;
+
+    /**
+     * @var \Magento\Customer\Model\AddressFactory
+     */
+    protected $addressFactory;
+
+    /**
+     * @var \Magento\Framework\Locale\ResolverInterface
+     */
+    protected $locale;
+
+    /**
+     * @var \Acommerce\Address\Model\ResourceModel\City\Collection
+     */
+    protected $cityCollection;
+
+    /**
+     * @var \Acommerce\Address\Model\ResourceModel\Township\Collection
+     */
+    protected $townshipCollection;
+
+    /**
+     * @var string
+     */
+    private $cityJson;
+
+    /**
+     * @var string
+     */
+    private $townshipJson;
+
+    /**
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\DataObject\Copy\Config $fieldsetConfig
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\Cache\Type\Config $configCacheType
+     * @param \Magento\Framework\Serialize\Serializer\Json $jsonHelper
+     * @param \Magento\Customer\Model\AddressFactory $addressFactory
+     * @param \Magento\Framework\Locale\ResolverInterface $locale
+     * @param \Acommerce\Address\Model\ResourceModel\City\CollectionFactory $cityCollection
+     * @param \Acommerce\Address\Model\ResourceModel\Township\CollectionFactory $townshipCollection
+     */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\DataObject\Copy\Config $fieldsetConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\Cache\Type\Config $configCacheType,
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\Serialize\Serializer\Json $jsonHelper,
         \Magento\Customer\Model\AddressFactory $addressFactory,
         \Magento\Framework\Locale\ResolverInterface $locale,
         \Acommerce\Address\Model\ResourceModel\City\CollectionFactory $cityCollection,
         \Acommerce\Address\Model\ResourceModel\Township\CollectionFactory $townshipCollection
     ) {
-        $this->logger = $logger;
         $this->fieldsetConfig = $fieldsetConfig;
         $this->storeManager = $storeManager;
         $this->configCacheType = $configCacheType;
@@ -39,6 +87,7 @@ class Data extends AbstractHelper
         $this->locale = $locale;
         $this->cityCollection = $cityCollection;
         $this->townshipCollection = $townshipCollection;
+        parent::__construct($context);
     }
 
     public function getExtraCheckoutAddressFields(
@@ -65,7 +114,7 @@ class Data extends AbstractHelper
             try {
                 $toObject->$set($value);
             } catch (\Exception $e) {
-                $this->logger->critical($e->getMessage());
+                $this->_logger->critical($e->getMessage());
             }
         }
         return $toObject;
@@ -88,7 +137,7 @@ class Data extends AbstractHelper
             $json = $this->configCacheType->load($cacheKey);
             if (empty($json)) {
                 $cities = $this->cityCollection->create()->load()->initLocale($this->locale)->getCityData();
-                $json = $this->jsonHelper->jsonEncode($cities);
+                $json = $this->jsonHelper->serialize($cities);
                 if ($json === false) {
                     $json = 'false';
                 }
@@ -116,7 +165,7 @@ class Data extends AbstractHelper
             $json = $this->configCacheType->load($cacheKey);
             if (empty($json)) {
                 $townships = $this->townshipCollection->create()->load()->initLocale($this->locale)->getTownshipData();
-                $json = $this->jsonHelper->jsonEncode($townships);
+                $json = $this->jsonHelper->serialize($townships);
                 if ($json === false) {
                     $json = 'false';
                 }
@@ -127,6 +176,11 @@ class Data extends AbstractHelper
         return $this->townshipJson;
     }
 
+    /**
+     * Retrieve address data
+     *
+     * @return string|bool
+     */
     public function getAddressData($addressId, $field)
     {
         $addressData = $this->addressFactory->create()->load($addressId);
@@ -134,5 +188,15 @@ class Data extends AbstractHelper
             return $addressData->getData($field);
         }
         return false;
+    }
+
+    /**
+     * Retrieve system config value
+     *
+     * @return string
+     */
+    public function getStoreConfigValue($configPath, $scope = \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT)
+    {
+        return $this->scopeConfig->getValue($configPath, $scope);
     }
 }

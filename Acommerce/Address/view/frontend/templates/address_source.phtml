@@ -1,0 +1,13 @@
+<script>
+    require(['jquery'],function($){
+        $(document).ready(function(){
+            if (localStorage.getItem("townshipData") == undefined) {
+                $.getJSON("<?php echo $block->getUrl('address/data/index') ?>", function(data){
+                    if(Object.keys(data).length > 0){
+                        localStorage.setItem("townshipData", JSON.stringify(data.township));
+                    }
+                });
+            }
+        });
+    });
+</script>
