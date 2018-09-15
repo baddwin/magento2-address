@@ -5,9 +5,11 @@ The module is working with magento 2.1.x, if you are using magento 2.2.x, you ne
 app\code\Acommerce\Address\view\base\ui_component\customer_form_22.xml
 app\code\Acommerce\Address\view\frontend\templates\address\edit22.phtml
 
-After installed, pls go to admin > customer > import address and use my sample csv in data folder to import. The order to import is regions > cities > townships (if you dont use township, you can ignore it)
+- After installed, pls go to admin > customer > import address and use my sample csv in data folder to import. The order to import is regions > cities > townships (if you dont use township, you can ignore it)
 
-Address template configuration (Stores > Configuration > Customer Configuration > Address template) - use this or change element sort order depend on your purpose
+- Configuration show/hide country and township under Stores > Configuration > Sales > Checkout > Checkout Address
+
+- Address template configuration (Stores > Configuration > Customer Configuration > Address template) - use this or change element sort order depend on your purpose
 
 Text
 
@@ -59,3 +61,14 @@ PDF
 {{depend telephone}}T: {{var telephone}}|{{/depend}}
 {{depend fax}}F: {{var fax}}|{{/depend}}|
 {{depend vat_id}}VAT: {{var vat_id}}{{/depend}}|
+
+- Update address format in checkout page
+  - Show Township in billing address Magento_Checkout/template/billing-address/details.html => use 
+`<!-- ko if: (currentBillingAddress().township) -->`
+`<!-- ko text: currentBillingAddress().township --><!-- /ko -->`
+`<!-- /ko -->` 
+
+  - Show Township in shipping address Magento_Checkout/template/shipping-address/address-renderer/default.html => use 
+`<!-- ko if: (address().township) -->`
+`<!-- ko text: address().township --><!-- /ko -->`
+`<!-- /ko -->`
