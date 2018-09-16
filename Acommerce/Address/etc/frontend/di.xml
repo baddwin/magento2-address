@@ -9,4 +9,7 @@
     <type name="Magento\Ui\Component\Form\AttributeMapper">
         <plugin disabled="false" name="Acommerce_Address_Plugin_Magento_Ui_Component_Form_AttributeMapper" sortOrder="10" type="Acommerce\Address\Plugin\Magento\Ui\Component\Form\AttributeMapper"/>
     </type>
+    <type name="Magento\Customer\Block\Address\Edit">
+        <plugin disabled="false" name="Acommerce_Address_Plugin_Magento_Customer_Block_Address_Edit" sortOrder="10" type="Acommerce\Address\Plugin\Magento\Customer\Block\Address\Edit"/>
+    </type>
 </config>

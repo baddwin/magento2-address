@@ -35,6 +35,7 @@
         <?php if ($_fax->isEnabled()): ?>
             <?= $_fax->setFax($block->getAddress()->getFax())->toHtml() ?>
         <?php endif ?>
+
     </fieldset>
     <fieldset class="fieldset">
         <legend class="legend"><span><?= $block->escapeHtml(__('Address')) ?></span></legend><br>
