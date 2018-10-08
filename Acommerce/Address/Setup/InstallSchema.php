@@ -5,6 +5,7 @@ namespace Acommerce\Address\Setup;
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 
 class InstallSchema implements InstallSchemaInterface
 {
@@ -18,11 +19,18 @@ class InstallSchema implements InstallSchemaInterface
      */
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-        $installer = $setup;
-        $installer->startSetup();
-        if (!$installer->tableExists('directory_region_city')) {
-            $tableCity = $installer->getConnection()
-                ->newTable($installer->getTable('directory_region_city'))
+        $setup->startSetup();
+
+        $connection = $setup->getConnection();
+        $regionTable = $setup->getTable('directory_country_region');
+        $cityTable = $setup->getTable('directory_region_city');
+        $cityNameTable = $setup->getTable('directory_region_city_name');
+        $townshipTable = $setup->getTable('directory_city_township');
+        $townshipNameTable = $setup->getTable('directory_city_township_name');
+
+        if ($connection->isTableExists($cityTable) == false) {
+            $tableCity = $connection
+                ->newTable($cityTable)
                 ->addColumn(
                     'city_id',
                     \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -51,18 +59,32 @@ class InstallSchema implements InstallSchemaInterface
                     ['default' => null],
                     'City Name'
                 )
+                ->addIndex(
+                    $setup->getIdxName(
+                        $cityTable,
+                        ['default_name'],
+                        AdapterInterface::INDEX_TYPE_FULLTEXT
+                    ),
+                    ['default_name'],
+                    ['type' => AdapterInterface::INDEX_TYPE_FULLTEXT]
+                )
                 ->addForeignKey(
-                    $setup->getFkName('directory_region_city', 'region_id', 'directory_country_region', 'region_id'),
+                    $setup->getFkName(
+                        $cityTable, 
+                        'region_id', 
+                        $regionTable, 
+                        'region_id'
+                    ),
                     'region_id',
-                    $setup->getTable('directory_country_region'),
+                    $regionTable,
                     'region_id',
                     \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
                 );
-            $installer->getConnection()->createTable($tableCity);
+            $connection->createTable($tableCity);
         }
-        if (!$installer->tableExists('directory_region_city_name')) {
-            $tableCityName = $installer->getConnection()
-                ->newTable($installer->getTable('directory_region_city_name'))
+        if ($connection->isTableExists($cityNameTable) == false) {
+            $tableCityName = $connection
+                ->newTable($cityNameTable)
                 ->addColumn(
                     'locale',
                     \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -85,18 +107,18 @@ class InstallSchema implements InstallSchemaInterface
                     'City Name'
                 )
                 ->addForeignKey(
-                    $setup->getFkName('directory_region_city_name', 'city_id', 'directory_region_city', 'city_id'),
+                    $setup->getFkName($cityNameTable, 'city_id', $cityTable, 'city_id'),
                     'city_id',
-                    $setup->getTable('directory_region_city'),
+                    $cityTable,
                     'city_id',
                     \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
                 );
-            $installer->getConnection()->createTable($tableCityName);
+            $connection->createTable($tableCityName);
         }
 
-        if (!$installer->tableExists('directory_city_township')) {
-            $tableTownship = $installer->getConnection()
-                ->newTable($installer->getTable('directory_city_township'))
+        if ($connection->isTableExists($townshipTable) == false) {
+            $tableTownship = $connection
+                ->newTable($townshipTable)
                 ->addColumn(
                     'township_id',
                     \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -132,18 +154,41 @@ class InstallSchema implements InstallSchemaInterface
                     ['default' => null],
                     'Postcode'
                 )
+                ->addIndex(
+                    $setup->getIdxName(
+                        $townshipTable,
+                        ['default_name'],
+                        AdapterInterface::INDEX_TYPE_FULLTEXT
+                    ),
+                    ['default_name'],
+                    ['type' => AdapterInterface::INDEX_TYPE_FULLTEXT]
+                )
+                ->addIndex(
+                    $setup->getIdxName(
+                        $townshipTable,
+                        ['postcode'],
+                        AdapterInterface::INDEX_TYPE_FULLTEXT
+                    ),
+                    ['postcode'],
+                    ['type' => AdapterInterface::INDEX_TYPE_FULLTEXT]
+                )
                 ->addForeignKey(
-                    $setup->getFkName('directory_city_township', 'city_id', 'directory_region_city', 'city_id'),
+                    $setup->getFkName(
+                        $townshipTable, 
+                        'city_id',
+                        $cityTable, 
+                        'city_id'
+                    ),
                     'city_id',
-                    $setup->getTable('directory_region_city'),
+                    $cityTable,
                     'city_id',
                     \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
                 );
-            $installer->getConnection()->createTable($tableTownship);
+            $connection->createTable($tableTownship);
         }
-        if (!$installer->tableExists('directory_city_township_name')) {
-            $tableTownshipName = $installer->getConnection()
-                ->newTable($installer->getTable('directory_city_township_name'))
+        if ($connection->isTableExists($townshipNameTable) == false) {
+            $tableTownshipName = $connection
+                ->newTable($townshipNameTable)
                 ->addColumn(
                     'locale',
                     \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -166,13 +211,13 @@ class InstallSchema implements InstallSchemaInterface
                     'Township Name'
                 )
                 ->addForeignKey(
-                    $setup->getFkName('directory_city_township_name', 'township_id', 'directory_city_township', 'township_id'),
+                    $setup->getFkName($townshipNameTable, 'township_id', $townshipTable, 'township_id'),
                     'township_id',
-                    $setup->getTable('directory_city_township'),
+                    $townshipTable,
                     'township_id',
                     \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
                 );
-            $installer->getConnection()->createTable($tableTownshipName);
+            $connection->createTable($tableTownshipName);
         }
 
         $customer_address = $setup->getTable('customer_address_entity');
@@ -197,24 +242,21 @@ class InstallSchema implements InstallSchemaInterface
                 'comment' => 'Township'
             ]
         ];
-        if ($setup->getConnection()->isTableExists($customer_address) == true) {
-            $connection = $setup->getConnection();
+        if ($connection->isTableExists($customer_address) == true) {
             foreach ($columns as $name => $definition) {
                 $connection->addColumn($customer_address, $name, $definition);
             }
         }
-        if ($setup->getConnection()->isTableExists($quote_address) == true) {
-            $connection = $setup->getConnection();
+        if ($connection->isTableExists($quote_address) == true) {
             foreach ($columns as $name => $definition) {
                 $connection->addColumn($quote_address, $name, $definition);
             }
         }
-        if ($setup->getConnection()->isTableExists($order_address) == true) {
-            $connection = $setup->getConnection();
+        if ($connection->isTableExists($order_address) == true) {
             foreach ($columns as $name => $definition) {
                 $connection->addColumn($order_address, $name, $definition);
             }
         }
-        $installer->endSetup();
+        $setup->endSetup();
     }
 }
