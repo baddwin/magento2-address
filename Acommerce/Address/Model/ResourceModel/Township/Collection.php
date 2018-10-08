@@ -4,6 +4,8 @@ namespace Acommerce\Address\Model\ResourceModel\Township;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
+    protected $_idFieldName = 'township_id';
+
     /**
      * Locale township name table name
      *

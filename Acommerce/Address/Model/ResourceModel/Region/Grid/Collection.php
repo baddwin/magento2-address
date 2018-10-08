@@ -2,7 +2,8 @@
 
 namespace Acommerce\Address\Model\ResourceModel\Region\Grid;
 
-class Collection extends \Acommerce\Address\Model\ResourceModel\Region\Collection implements \Magento\Framework\Api\Search\SearchResultInterface
+class Collection extends \Acommerce\Address\Model\ResourceModel\Region\Collection implements 
+    \Magento\Framework\Api\Search\SearchResultInterface
 {
     /**
      * Aggregations

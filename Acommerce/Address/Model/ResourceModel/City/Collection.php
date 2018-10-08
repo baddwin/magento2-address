@@ -4,6 +4,8 @@ namespace Acommerce\Address\Model\ResourceModel\City;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
+    protected $_idFieldName = 'city_id';
+
     /**
      * Locale region name table name
      *
