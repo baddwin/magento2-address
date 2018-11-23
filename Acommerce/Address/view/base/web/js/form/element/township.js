@@ -16,19 +16,10 @@ define([
     return Select.extend({
         defaults: {
             skipValidation: false,
+            options: JSON.parse(localStorage.getItem("townshipData")),
             imports: {
                 update: '${ $.parentName }.city_id:value'
-            }
-        },
-
-        /**
-         * Extends instance with defaults, extends config with formatted values
-         *     and options, and invokes initialize method of AbstractElement class.
-         *     If instance's 'customEntry' property is set to true, calls 'initInput'
-         */
-        initialize: function () {
-            this._super();
-            this.initialOptions = JSON.parse(localStorage.getItem("townshipData"));
+            },
         },
 
         /**
