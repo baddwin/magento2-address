@@ -65,5 +65,16 @@
                 <aspect name="to_quote_address" />
             </field>
         </fieldset>
+        <fieldset id="order_address">
+            <field name="city_id">
+                <aspect name="to_customer_address" />
+            </field>
+            <field name="township">
+                <aspect name="to_customer_address" />
+            </field>
+            <field name="township_id">
+                <aspect name="to_customer_address" />
+            </field>
+        </fieldset>
     </scope>
 </config>

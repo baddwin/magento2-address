@@ -4,17 +4,17 @@ namespace Acommerce\Address\Observer\Sales;
 
 class ModelServiceQuoteSubmitBefore implements \Magento\Framework\Event\ObserverInterface
 {
+    /**
+     * @var \Acommerce\Address\Helper\Data
+     */
     protected $helper;
-    protected $logger;
-    protected $quoteRepository;
 
+    /**
+     * @param \Acommerce\Address\Helper\Data $helper
+     */
     public function __construct(
-        \Magento\Quote\Model\QuoteRepository $quoteRepository,
-        \Psr\Log\LoggerInterface $logger,
         \Acommerce\Address\Helper\Data $helper
     ) {
-        $this->quoteRepository = $quoteRepository;
-        $this->logger = $logger;
         $this->helper = $helper;
     }
 
@@ -28,8 +28,8 @@ class ModelServiceQuoteSubmitBefore implements \Magento\Framework\Event\Observer
         \Magento\Framework\Event\Observer $observer
     ) {
         /** @var \Magento\Sales\Model\Order $order */
-        $order = $observer->getOrder();
-        $quote = $this->quoteRepository->get($order->getQuoteId());
+        $order = $observer->getEvent()->getOrder();
+        $quote = $observer->getEvent()->getQuote();
 
         $this->helper->transportFieldsFromExtensionAttributesToObject(
             $quote->getBillingAddress(),
@@ -42,5 +42,19 @@ class ModelServiceQuoteSubmitBefore implements \Magento\Framework\Event\Observer
             $order->getShippingAddress(),
             'extra_checkout_shipping_address_fields'
         );
+
+        $orderBilling = $order->getBillingAddress();
+        $orderShipping = $order->getShippingAddress();
+        if ($orderBilling && $orderShipping) {
+            if (!$orderBilling->getCityId()) {
+                $orderBilling->setCityId($orderShipping->getCityId());
+            }
+            if (!$orderBilling->getTownship()) {
+                $orderBilling->setTownship($orderShipping->getTownship());
+            }
+            if (!$orderBilling->getTownshipId()) {
+                $orderBilling->setTownshipId($orderShipping->getTownshipId());
+            }
+        }
     }
 }
