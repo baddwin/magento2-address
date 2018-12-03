@@ -4,8 +4,9 @@ define([
     'Magento_Checkout/js/model/quote'
 ], function ($, wrapper, quote) {
     'use strict';
-    return function (setBillingAddressAction) {
-        return wrapper.wrap(setBillingAddressAction, function (originalAction, messageContainer) {
+
+    return function (placeOrderAction) {
+        return wrapper.wrap(placeOrderAction, function (originalAction, paymentData, messageContainer) {
             var billingAddress = quote.billingAddress();
             if(billingAddress != undefined) {
                 if (billingAddress['extension_attributes'] === undefined) {
@@ -32,7 +33,8 @@ define([
                     delete billingAddress.township_id;
                 }
             }
-            return originalAction(messageContainer);
+
+            return originalAction(paymentData, messageContainer);
         });
     };
 });

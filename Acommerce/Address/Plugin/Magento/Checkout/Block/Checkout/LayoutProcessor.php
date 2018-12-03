@@ -32,14 +32,12 @@ class LayoutProcessor
         return $result;
     }
 
-    protected function getShippingFormFields($result){
-        if(isset($result['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['shipping-address-fieldset'])
-        ){
-            $shippingCustomFields = $this->getFields('shippingAddress.custom_attributes','shipping');
+    protected function getShippingFormFields($result) {
+        $shippingFieldset = $result['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['shipping-address-fieldset'];
+        if(isset($shippingFieldset)){
+            $shippingCustomFields = $this->getFields('shippingAddress','shipping');
 
-            $shippingFields = $result['components']['checkout']['children']['steps']['children']
-            ['shipping-step']['children']['shippingAddress']['children']
-            ['shipping-address-fieldset']['children'];
+            $shippingFields = $shippingFieldset['children'];
             if(isset($shippingFields['street'])){
                 unset($shippingFields['street']['children'][1]['validation']);
                 unset($shippingFields['street']['children'][2]['validation']);
@@ -57,6 +55,9 @@ class LayoutProcessor
         $result['components']['checkout']['children']['steps']['children']['shipping-step']
         ['children']['shippingAddress']['children']['shipping-address-fieldset']
         ['children']['city']['sortOrder'] = 108;
+        $result['components']['checkout']['children']['steps']['children']['shipping-step']
+        ['children']['shippingAddress']['children']['shipping-address-fieldset']
+        ['children']['city']['visible'] = false;
 
         if ($this->helper->getStoreConfigValue('checkout/checkout_address/disable_country', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE)) {
             $result['components']['checkout']['children']['steps']['children']['shipping-step']
@@ -68,10 +69,9 @@ class LayoutProcessor
     }
 
     protected function getBillingFormFields($result) {
-        if (isset($result['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list'])) {
-            $paymentForms = $result['components']['checkout']['children']['steps']['children']
-            ['billing-step']['children']['payment']['children']
-            ['payments-list']['children'];
+        $billingFieldset = $result['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list'];
+        if (isset($billingFieldset)) {
+            $paymentForms = $billingFieldset['children'];
             foreach ($paymentForms as $paymentMethodForm => $paymentMethodValue) {
                 $paymentMethodCode = str_replace('-form', '', $paymentMethodForm);
                 if (!isset($result['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list']['children'][$paymentMethodCode . '-form'])) {
@@ -80,14 +80,15 @@ class LayoutProcessor
                 $billingFields = $result['components']['checkout']['children']['steps']['children']
                 ['billing-step']['children']['payment']['children']
                 ['payments-list']['children'][$paymentMethodCode . '-form']['children']['form-fields']['children'];
-                $billingPostcodeFields = $this->getFields('billingAddress' . $paymentMethodCode . '.custom_attributes','billing');
-                $billingFields = array_replace_recursive($billingFields, $billingPostcodeFields);
+                $billingCustomFields = $this->getFields('billingAddress' . $paymentMethodCode,'billing');
+                $billingFields = array_replace_recursive($billingFields, $billingCustomFields);
 
                 if(isset($billingFields['township'])){
                     unset($billingFields['township']);
                 }
 
                 $billingFields['city']['sortOrder'] = 108;
+                $billingFields['city']['visible'] = false;
 
                 $result['components']['checkout']['children']['steps']['children']
                 ['billing-step']['children']['payment']['children']
@@ -107,19 +108,24 @@ class LayoutProcessor
     protected function getFields($scope, $addressType) {
         $fields = [];
         foreach ($this->getAdditionalFields($addressType) as $field) {
-            $fields[$field] = $this->getField($field, $scope);
+            $fields[$field] = $this->getField($field, $scope, $addressType);
         }
         return $fields;
     }
 
-    protected function getAdditionalFields($addressType='shipping'){
+    protected function getAdditionalFields($addressType = 'shipping') {
         if ($addressType == 'shipping') {
             return $this->helper->getExtraCheckoutAddressFields('extra_checkout_shipping_address_fields');
         }
         return  $this->helper->getExtraCheckoutAddressFields('extra_checkout_billing_address_fields');
     }
 
-    protected function getField($attributeCode, $scope) {
+    protected function getField($attributeCode, $scope, $addressType = 'shipping') {
+        $target = '${ $.provider }:${ $.parentScope }';
+        if ($addressType == 'shipping') {
+            $target = 'checkoutProvider:shippingAddress';
+        }
+
         $disableTownship = (bool) $this->helper->getStoreConfigValue('checkout/checkout_address/disable_township', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
         $field = [];
         if ($attributeCode == 'city_id') {
@@ -127,14 +133,14 @@ class LayoutProcessor
                 'component' => 'Acommerce_Address/js/form/element/city',
                 'config' => [
                     'customScope' => $scope,
-                    // 'customEntry' => 'shippingAddress.custom_attributes.city',
+                    // 'customEntry' => $scope . '.city',
                     'elementTmpl' => 'ui/form/element/select',
                 ],
                 'validation' => [
                     'required-entry' => true,
                 ],
                 'filterBy' => [
-                    'target' => 'checkoutProvider:shippingAddress.region_id',
+                    'target' => $target . '.region_id',
                     'field' => 'region_id',
                 ],
                 'imports' => [
@@ -149,14 +155,14 @@ class LayoutProcessor
                 'component' => 'Acommerce_Address/js/form/element/township',
                 'config' => [
                     'customScope' => $scope,
-                    'customEntry' => 'shippingAddress.custom_attributes.township',
+                    'customEntry' => $scope . '.township',
                     'elementTmpl' => 'ui/form/element/select',
                 ],
                 'validation' => [
                     'required-entry' => true,
                 ],
                 'filterBy' => [
-                    'target' => 'checkoutProvider:shippingAddress.city_id',
+                    'target' => $target . '.city_id',
                     'field' => 'city_id',
                 ],
                 'imports' => [

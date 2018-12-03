@@ -40,16 +40,16 @@ class Save extends \Acommerce\Address\Controller\Adminhtml\Address
                             $this->_importTownship($importRawData);
                             break;
                     }
-                    $this->messageManager->addSuccess(__('Address has been imported.'));
+                    $this->messageManager->addSuccessMessage(__('Address has been imported.'));
                     $this->_redirect('*/*');
                     return;
                 } else {
-                    $this->messageManager->addError(__('Import file containt error. Please try again.'));
+                    $this->messageManager->addErrorMessage(__('Import file containt error. Please try again.'));
                     $this->_redirect('*/*');
                     return;
                 }
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                $this->messageManager->addError(
+                $this->messageManager->addErrorMessage(
                     __('Something went wrong while saving the data. Please review the error log.')
                 );
                 $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);

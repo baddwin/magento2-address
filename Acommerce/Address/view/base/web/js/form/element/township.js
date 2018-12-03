@@ -1,25 +1,34 @@
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
-/**
  * @api
  */
 define([
     'underscore',
     'uiRegistry',
+    'mage/translate',
     'Magento_Ui/js/form/element/select'
-], function (_, registry, Select) {
+], function (_, registry, $t, Select) {
     'use strict';
 
     return Select.extend({
         defaults: {
             skipValidation: false,
-            options: JSON.parse(localStorage.getItem("townshipData")),
+            options: [],
+            caption: $t('Please select a township.'),
             imports: {
                 update: '${ $.parentName }.city_id:value'
             },
+        },
+
+        /**
+         * Calls 'initObservable' of parent, initializes 'options' and 'initialOptions'
+         *     properties, calls 'setOptions' passing options to it
+         *
+         * @returns {Object} Chainable.
+         */
+        initObservable: function () {
+            this._super();
+            this.initialOptions = JSON.parse(localStorage.getItem("townshipData"));
+            return this;
         },
 
         /**

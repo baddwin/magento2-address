@@ -20,28 +20,37 @@ class Save extends \Acommerce\Address\Controller\Adminhtml\Address
 
         $data = $this->getRequest()->getPostValue();
         if ($data) {
-            $city_id = $this->getRequest()->getParam('city_id');
+            if (empty($data['city_id'])) {
+                $data['city_id'] = null;
+            }
+
             /** @var \Acommerce\Address\Model\City $model */
-            $model = $this->cityFactory->create()->load($city_id);
-            if (!$model->getCityId() && $city_id) {
-                $this->messageManager->addError(__('This city no longer exists.'));
-                return $resultRedirect->setPath('*/*/');
+            $model = $this->cityFactory->create();
+
+            $city_id = $this->getRequest()->getParam('city_id');
+            if ($city_id) {
+                try {
+                    $model = $model->load($city_id);
+                } catch (LocalizedException $e) {
+                    $this->messageManager->addErrorMessage(__('This city no longer exists.'));
+                    return $resultRedirect->setPath('*/*/');
+                }
             }
 
             $model->setData($data);
 
             try {
                 $model->save();
-                $this->messageManager->addSuccess(__('You saved the city.'));
+                $this->messageManager->addSuccessMessage(__('You saved the city.'));
 
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['city_id' => $model->getCityId()]);
                 }
                 return $resultRedirect->setPath('*/*/');
             } catch (LocalizedException $e) {
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
             } catch (\Exception $e) {
-                $this->messageManager->addException($e, __('Something went wrong while saving the city.'));
+                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the city.'));
             }
 
             $this->_getSession()->setFormData($data);

@@ -15,7 +15,7 @@
                             <resource id="Acommerce_Address::city_edit" title="Edit" />
                             <resource id="Acommerce_Address::city_delete" title="Delete"/>
                         </resource>
-                        <resource id="Acommerce_Address::township" title="Township Manager">
+                        <resource id="Acommerce_Address::township" title="Townships Manager">
                             <resource id="Acommerce_Address::township_create" title="Create"/>
                             <resource id="Acommerce_Address::township_edit" title="Edit" />
                             <resource id="Acommerce_Address::township_delete" title="Delete"/>

@@ -22,23 +22,22 @@ class Delete extends \Acommerce\Address\Controller\Adminhtml\Address
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($city_id) {
-            $city_name = '';
             try {
                 // init model and delete
                 $model = $this->cityFactory->create()->load($city_id);
                 $city_name = $model->getDefaultName();
                 $model->delete();
-                $this->messageManager->addSuccess(__('The '.$city_name.' city has been deleted.'));
+                $this->messageManager->addSuccessMessage(__('The city %1 has been deleted.', $city_name));
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
                 // display error message
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
                 // go back to edit form
                 return $resultRedirect->setPath('*/*/edit', ['city_id' => $city_id]);
             }
         }
         // display error message
-        $this->messageManager->addError(__('City to delete was not found.'));
+        $this->messageManager->addErrorMessage(__('City to delete was not found.'));
         // go to grid
         return $resultRedirect->setPath('*/*/');
     }

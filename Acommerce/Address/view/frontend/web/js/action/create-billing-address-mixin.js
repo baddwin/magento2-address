@@ -4,8 +4,8 @@ define([
     'Magento_Checkout/js/model/quote'
 ], function ($, wrapper,quote) {
     'use strict';
-    return function (setShippingInformationAction) {
-        return wrapper.wrap(setShippingInformationAction, function (originalAction, messageContainer) {
+    return function (setBillingAddressAction) {
+        return wrapper.wrap(setBillingAddressAction, function (originalAction, messageContainer) {
             var customAttributes = {};
             if (messageContainer.city_id !== undefined) {
                 customAttributes['city_id'] = {'attribute_code':'city_id', 'value': messageContainer.city_id};

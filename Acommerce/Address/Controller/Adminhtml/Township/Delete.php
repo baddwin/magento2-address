@@ -22,23 +22,22 @@ class Delete extends \Acommerce\Address\Controller\Adminhtml\Address
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($township_id) {
-            $township_name = '';
             try {
                 // init model and delete
                 $model = $this->townshipFactory->create()->load($township_id);
                 $township_name = $model->getDefaultName();
                 $model->delete();
-                $this->messageManager->addSuccess(__('The '.$township_name.' has been deleted.'));
+                $this->messageManager->addSuccessMessage(__('The township %1 has been deleted.', $township_name));
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
                 // display error message
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
                 // go back to edit form
                 return $resultRedirect->setPath('*/*/edit', ['township_id' => $township_id]);
             }
         }
         // display error message
-        $this->messageManager->addError(__('Township to delete was not found.'));
+        $this->messageManager->addErrorMessage(__('Township to delete was not found.'));
         // go to grid
         return $resultRedirect->setPath('*/*/');
     }

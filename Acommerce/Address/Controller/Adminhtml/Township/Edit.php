@@ -27,7 +27,7 @@ class Edit extends \Acommerce\Address\Controller\Adminhtml\Address
         if ($township_id && $township_id > 0) {
             $model->load($township_id);
             if (!$model->getTownshipId()) {
-                $this->messageManager->addError(__('This township no longer exists.'));
+                $this->messageManager->addErrorMessage(__('This township no longer exists.'));
                 /** \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
@@ -35,13 +35,12 @@ class Edit extends \Acommerce\Address\Controller\Adminhtml\Address
             $default_name = $model->getDefaultName();
         }
 
-        $formData = $this->sessionFactory->create()->getFormData(true);
+        $formData = $this->_session->getFormData(true);
         if (!empty($formData)) {
             $model->setData($formData);
         }
 
         $this->coreRegistry->register('acommerce_address_township', $model);
-        $this->coreRegistry->register('acommerce_address_city_list', $this->cityFactory->create()->getCollection()->toOptionArray());
 
         // Build edit form
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */

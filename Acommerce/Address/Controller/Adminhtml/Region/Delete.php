@@ -21,23 +21,22 @@ class Delete extends \Acommerce\Address\Controller\Adminhtml\Address
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($region_id) {
-            $region_name = '';
             try {
                 // init model and delete
                 $model = $this->regionFactory->create()->load($region_id);
                 $region_name = $model->getDefaultName();
                 $model->delete();
-                $this->messageManager->addSuccess(__('The '.$region_name.' Region has been deleted.'));
+                $this->messageManager->addSuccessMessage(__('The region %1 has been deleted.', $region_name));
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
                 // display error message
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
                 // go back to edit form
                 return $resultRedirect->setPath('*/*/edit', ['region_id' => $region_id]);
             }
         }
         // display error message
-        $this->messageManager->addError(__('Region to delete was not found.'));
+        $this->messageManager->addErrorMessage(__('Region to delete was not found.'));
         // go to grid
         return $resultRedirect->setPath('*/*/');
     }

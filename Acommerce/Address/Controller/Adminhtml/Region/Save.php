@@ -20,28 +20,37 @@ class Save extends \Acommerce\Address\Controller\Adminhtml\Address
 
         $data = $this->getRequest()->getPostValue();
         if ($data) {
-            $region_id = $this->getRequest()->getParam('region_id');
+            if (empty($data['region_id'])) {
+                $data['region_id'] = null;
+            }
+
             /** @var \Acommerce\Address\Model\Region $model */
-            $model = $this->regionFactory->create()->load($region_id);
-            if (!$model->getRegionId() && $region_id) {
-                $this->messageManager->addError(__('This region no longer exists.'));
-                return $resultRedirect->setPath('*/*/');
+            $model = $this->regionFactory->create();
+
+            $region_id = $this->getRequest()->getParam('region_id');
+            if ($region_id) {
+                try {
+                    $model = $model->load($region_id);
+                } catch (LocalizedException $e) {
+                    $this->messageManager->addErrorMessage(__('This region no longer exists.'));
+                    return $resultRedirect->setPath('*/*/');
+                }
             }
 
             $model->setData($data);
 
             try {
                 $model->save();
-                $this->messageManager->addSuccess(__('You saved the region.'));
+                $this->messageManager->addSuccessMessage(__('You saved the region.'));
 
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['region_id' => $model->getRegionId()]);
                 }
                 return $resultRedirect->setPath('*/*/');
             } catch (LocalizedException $e) {
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
             } catch (\Exception $e) {
-                $this->messageManager->addException($e, __('Something went wrong while saving the region.'));
+                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the region.'));
             }
 
             $this->_getSession()->setFormData($data);

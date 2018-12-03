@@ -20,28 +20,37 @@ class Save extends \Acommerce\Address\Controller\Adminhtml\Address
 
         $data = $this->getRequest()->getPostValue();
         if ($data) {
-            $township_id = $this->getRequest()->getParam('township_id');
+            if (empty($data['township_id'])) {
+                $data['township_id'] = null;
+            }
+
             /** @var \Acommerce\Address\Model\Township $model */
-            $model = $this->townshipFactory->create()->load($township_id);
-            if (!$model->getTownshipId() && $township_id) {
-                $this->messageManager->addError(__('This township no longer exists.'));
-                return $resultRedirect->setPath('*/*/');
+            $model = $this->townshipFactory->create();
+
+            $township_id = $this->getRequest()->getParam('township_id');
+            if ($township_id) {
+                try {
+                    $model = $model->load($township_id);
+                } catch (LocalizedException $e) {
+                    $this->messageManager->addErrorMessage(__('This township no longer exists.'));
+                    return $resultRedirect->setPath('*/*/');
+                }
             }
 
             $model->setData($data);
 
             try {
                 $model->save();
-                $this->messageManager->addSuccess(__('You saved the township.'));
+                $this->messageManager->addSuccessMessage(__('You saved the township.'));
 
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['township_id' => $model->getTownshipId()]);
                 }
                 return $resultRedirect->setPath('*/*/');
             } catch (LocalizedException $e) {
-                $this->messageManager->addError($e->getMessage());
+                $this->messageManager->addErrorMessage($e->getMessage());
             } catch (\Exception $e) {
-                $this->messageManager->addException($e, __('Something went wrong while saving the township.'));
+                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the township.'));
             }
 
             $this->_getSession()->setFormData($data);

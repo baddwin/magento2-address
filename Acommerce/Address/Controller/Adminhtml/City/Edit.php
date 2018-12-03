@@ -27,7 +27,7 @@ class Edit extends \Acommerce\Address\Controller\Adminhtml\Address
         if ($city_id && $city_id > 0) {
             $model->load($city_id);
             if (!$model->getCityId()) {
-                $this->messageManager->addError(__('This city no longer exists.'));
+                $this->messageManager->addErrorMessage(__('This city no longer exists.'));
                 /** \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
@@ -35,13 +35,12 @@ class Edit extends \Acommerce\Address\Controller\Adminhtml\Address
             $default_name = $model->getDefaultName();
         }
 
-        $formData = $this->sessionFactory->create()->getFormData(true);
+        $formData = $this->_session->getFormData(true);
         if (!empty($formData)) {
             $model->setData($formData);
         }
 
         $this->coreRegistry->register('acommerce_address_city', $model);
-        $this->coreRegistry->register('acommerce_address_region_list', $this->regionFactory->create()->getCollection()->toOptionArray());
 
         // Build edit form
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
